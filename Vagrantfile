@@ -66,7 +66,9 @@ sudo git clone https://github.com/phalcon/cphalcon -b 2.1.x --single-branch
 cd cphalcon/
 
 sudo ~/.composer/vendor/bin/zephir build --backend=ZendEngine3
-sudo echo "extension=phalcon.so" >> /etc/php/7.0/fpm/conf.d/20-phalcon.ini
+sudo echo "extension=phalcon.so" >> /etc/php/7.0/mods-available/20-phalcon.ini
+sudo cd /etc/php/7.0/fpm/conf.d/ + ln -s ../../mods-available/20-phalcon.ini 20-phalcon.ini
+sudo cd /etc/php/7.0/cli/conf.d/ + ln -s ../../mods-available/20-phalcon.ini 20-phalcon.ini
 
 # some additional php settings if you care
 sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php/7.0/cli/php.ini
