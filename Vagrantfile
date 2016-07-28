@@ -45,6 +45,7 @@ sudo apt-get install -y --allow-unauthenticated \
 	php7.0-intl \
 	php7.0-zip \
 	php7.0-pgsql \
+	php7.0-sqlite3 \
 	build-essential \
 	git \
 	gcc \
@@ -67,8 +68,8 @@ cd cphalcon/
 
 sudo ~/.composer/vendor/bin/zephir build --backend=ZendEngine3
 sudo echo "extension=phalcon.so" >> /etc/php/7.0/mods-available/20-phalcon.ini
-sudo cd /etc/php/7.0/fpm/conf.d/ + ln -s ../../mods-available/20-phalcon.ini 20-phalcon.ini
-sudo cd /etc/php/7.0/cli/conf.d/ + ln -s ../../mods-available/20-phalcon.ini 20-phalcon.ini
+cd /etc/php/7.0/fpm/conf.d/ + sudo ln -s ../../mods-available/20-phalcon.ini 20-phalcon.ini
+cd /etc/php/7.0/cli/conf.d/ + sudo ln -s ../../mods-available/20-phalcon.ini 20-phalcon.ini
 
 # some additional php settings if you care
 sudo sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php/7.0/cli/php.ini

@@ -11,3 +11,4 @@ Task Progress Record
 - yey, it works. Looks like i need a project now "vendor/bin/phalcon.php project fms simple ."
 - Command interface looks like symfony app/console but very simplified
 - OK... replace simple project with cli ;)
+- Looks like vagrant needed more configuration and addition of sqlite

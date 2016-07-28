@@ -13,5 +13,12 @@ return new \Phalcon\Config(array(
      *
      * You can disable this behaviour if the output of your application needs to don't have a new line at end
      */
-    'printNewLine' => true
+    'printNewLine' => true,
+    "database" => [
+        "adapter" => "sqlite",
+        "dbname" => __DIR__ . "/test.sqlite",
+    ],
+    "application" => [
+        "modelsDir" =>  "../../models",
+    ],
 ));
