@@ -9,6 +9,11 @@ Task Progress Record
 - Looks like vagrant wasn't really configured properly (by default), lets look into this 
 - Reconfigured to have phalcon extension available and installed phalcon tools via composer
 - yey, it works. Looks like i need a project now "vendor/bin/phalcon.php project fms simple ."
-- Command interface looks like symfony app/console but very simplified
+- Command interface looks like zend1 console ;)
 - OK... replace simple project with cli ;)
-- Looks like vagrant needed more configuration and addition of sqlite
+- Looks like vagrant required more configuration and addition of sqlite
+- Lets try to provide skeleton for filesystem classes
+- Actually before we do this lets get behat up and running (vagrant vm behat extension dependency missing php7.0-mbstring)
+- And lets create initial db schema using the task
+- Now time for models creation based on created db schema
+- Wow, phalcon db! I hate you so far ;) What is this repository, entity, model, dto? All at once with access to DI?!

@@ -9,3 +9,11 @@
 $di->setShared('config', function () use ($config) {
     return $config;
 });
+
+$di->setShared('db', function() use ($config) {
+
+    $config = [
+        'dbname' => $config->database->dbname,
+    ];
+    return new \Phalcon\Db\Adapter\Pdo\Sqlite($config);
+});

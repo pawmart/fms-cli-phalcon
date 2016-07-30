@@ -1,5 +1,8 @@
 {
   "require": {
     "phalcon/devtools": "dev-master"
+  },
+  "require-dev": {
+    "behat/behat": "^3.1"
   }
 }
