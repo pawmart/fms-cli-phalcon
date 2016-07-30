@@ -7,78 +7,90 @@ namespace Pawel\Fms;
  */
 class Folder extends \Phalcon\Mvc\Model implements FolderInterface
 {
+
+    // TODO: Move this constant to abstract model (when we have our own).
+    const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
     use RepositoryTrait;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     public $id;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $name;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $path;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $date_created;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     public $parent_id;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     public $filesystem_id;
 
 
+    /**
+     * @inheritdoc
+     */
     public function getName()
     {
-        // TODO: Implement getName() method.
+        return $this->name;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setName($name)
     {
-        // TODO: Implement setName() method.
+        $this->name = $name;
+
+        return $this;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getCreatedTime()
     {
-        // TODO: Implement getCreatedTime() method.
+        return DateTime::createFromFormat(self::DATE_TIME_FORMAT, $this->date_created);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setCreatedTime($created)
     {
-        // TODO: Implement setCreatedTime() method.
+        if (!$created instanceof \DateTime) {
+            throw new \LogicException('Date added should be DateTime object');
+        }
+
+        $this->date_created = $created->format(self::DATE_TIME_FORMAT);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getPath()
     {
-        // TODO: Implement getPath() method.
+        return $this->path;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setPath($path)
     {
-        // TODO: Implement setPath() method.
+        $this->path = $path;
+
+        return $this;
     }
 
 
@@ -87,13 +99,14 @@ class Folder extends \Phalcon\Mvc\Model implements FolderInterface
      */
     public function initialize()
     {
-        $this->hasMany('id', 'Files', 'folder_id', array('alias' => 'Files'));
-        $this->hasMany('id', 'Folders', 'parent_id', array('alias' => 'Folders'));
-        $this->belongsTo('parent_id', 'Folders', 'id', array('alias' => 'Folders'));
-        $this->belongsTo('filesystem_id', 'Filesystems', 'id', array('alias' => 'Filesystems'));
+        $this->hasMany('id', File::class, 'folder_id', ['alias' => File::class]);
+        $this->hasMany('id', Folder::class, 'parent_id', ['alias' => Folder::class]);
+        $this->belongsTo('parent_id', Folder::class, 'id', ['alias' => Folder::class]);
+        $this->belongsTo('filesystem_id', Filesystem::class, 'id', ['alias' => Filesystem::class]);
 
         $this->keepSnapshots(true);
     }
+
 
     /**
      * Returns table name mapped in the model.
@@ -103,28 +116,6 @@ class Folder extends \Phalcon\Mvc\Model implements FolderInterface
     public function getSource()
     {
         return 'folders';
-    }
-
-    /**
-     * Allows to query a set of records that match the specified conditions
-     *
-     * @param mixed $parameters
-     * @return Folders[]
-     */
-    public static function find($parameters = null)
-    {
-        return parent::find($parameters);
-    }
-
-    /**
-     * Allows to query the first record that match the specified conditions
-     *
-     * @param mixed $parameters
-     * @return Folders
-     */
-    public static function findFirst($parameters = null)
-    {
-        return parent::findFirst($parameters);
     }
 
 }

@@ -69,6 +69,12 @@ class DbTask extends \Phalcon\Cli\Task
                             "notNull" => true,
                         ]
                     ),
+                    new Column("type",
+                        [
+                            "type"    => Column::TYPE_INTEGER,
+                            "notNull" => true,
+                        ]
+                    ),
                 ],
                 "indexes" => [
                     new Index(

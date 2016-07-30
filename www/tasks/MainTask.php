@@ -12,11 +12,22 @@ class MainTask extends \Phalcon\Cli\Task
      */
     public function mainAction()
     {
-        $filesystem = $this->getOrCreateFilesystem( __DIR__ . '/roottest');
+        $filesystem = $this->getOrCreateFilesystem(__DIR__ . '/roottest');
 
-        // TODO: Do something with filesystem.
+        $folder = new \Pawel\Fms\Folder();
+        $folder->setName('pawel');
+        $folder->setPath($filesystem->rootPath . '/' . $folder->getName());
+        $dateTime = new \DateTime();
+        $folder->setCreatedTime($dateTime);
 
+        $file = new \Pawel\Fms\File();
+        $file->setName('test.txt');
+        $file->size = 0;
 
+        $rootFolder = $filesystem->createRootFolder(new \Pawel\Fms\Folder());
+        $filesystem->createFolder($folder, $rootFolder);
+
+        $filesystem->createFile($file, $folder);
     }
 
 
@@ -27,18 +38,16 @@ class MainTask extends \Phalcon\Cli\Task
      */
     protected function getOrCreateFilesystem($path)
     {
-        $filesystem = new \Pawel\Fms\Filesystem();
-
-        $entity = $filesystem->findFirst(['rootPath' => $path]);
+        $entity = \Pawel\Fms\Filesystem::findFirst(['rootPath' => $path]);
 
         if ($entity) {
             return $entity;
         }
 
-        // Nothing found in db, lets create new one.
+        // Nothing found in db, lets create one.
         $filesystem           = new \Pawel\Fms\Filesystem();
         $filesystem->rootPath = $path;
-        // TODO: inject type of the adapter this will be using.
+        $filesystem->type = \Pawel\Fms\Filesystem::TYPE_LOCAL;
         $filesystem->save();
 
         return $filesystem;

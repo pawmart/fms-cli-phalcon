@@ -7,108 +7,140 @@ namespace Pawel\Fms;
  */
 class File extends \Phalcon\Mvc\Model implements FileInterface
 {
+
+    // TODO: Move this constant to abstract model (when we have our own).
+    const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
     use RepositoryTrait;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     public $id;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $name;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     public $size;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $date_created;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var string */
     public $date_modified;
 
-    /**
-     *
-     * @var integer
-     */
+    /** @var integer */
     public $folder_id;
 
 
+    /**
+     * @inheritdoc
+     */
     public function getName()
     {
-        // TODO: Implement getName() method.
+        return $this->name;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setName($name)
     {
-        // TODO: Implement setName() method.
+        $this->name = $name;
+
+        return $this;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getSize()
     {
-        // TODO: Implement getSize() method.
+        return $this->size;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setSize($size)
     {
-        // TODO: Implement setSize() method.
+        $this->size = $size;
+
+        return $this;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getCreatedTime()
     {
-        // TODO: Implement getCreatedTime() method.
+        return DateTime::createFromFormat(self::DATE_TIME_FORMAT, $this->date_created);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setCreatedTime($created)
     {
-        // TODO: Implement setCreatedTime() method.
+        if (!$created instanceof \DateTime) {
+            throw new \LogicException('Date added should be DateTime object');
+        }
+
+        $this->date_created = $created->format(self::DATE_TIME_FORMAT);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getModifiedTime()
     {
-        // TODO: Implement getModifiedTime() method.
+        return DateTime::createFromFormat(self::DATE_TIME_FORMAT, $this->date_created);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setModifiedTime($modified)
     {
-        // TODO: Implement setModifiedTime() method.
+        if (!$modified instanceof \DateTime) {
+            throw new \LogicException('Date modified should be DateTime object');
+        }
+
+        $this->date_modified = $modified->format(self::DATE_TIME_FORMAT);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getParentFolder()
     {
-        // TODO: Implement getParentFolder() method.
+        // TODO: There must the another way to do this (this sucks).
+        return Folder::findFirst(['id' => $this->folder_id]);
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function setParentFolder(FolderInterface $parent)
     {
-        // TODO: Implement setParentFolder() method.
+        $this->folder_id = $parent->id;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getPath()
     {
-        // TODO: Implement getPath() method.
+        return $this->getParentFolder()->getPath();
     }
 
 
@@ -117,10 +149,11 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
      */
     public function initialize()
     {
-        $this->belongsTo('folder_id', 'Folders', 'id', array('alias' => 'Folders'));
+        $this->belongsTo('folder_id', Folder::class, 'id', ['alias' => Folder::class]);
 
         $this->keepSnapshots(true);
     }
+
 
     /**
      * Returns table name mapped in the model.
@@ -130,28 +163,6 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
     public function getSource()
     {
         return 'files';
-    }
-
-    /**
-     * Allows to query a set of records that match the specified conditions
-     *
-     * @param mixed $parameters
-     * @return Files[]
-     */
-    public static function find($parameters = null)
-    {
-        return parent::find($parameters);
-    }
-
-    /**
-     * Allows to query the first record that match the specified conditions
-     *
-     * @param mixed $parameters
-     * @return Files
-     */
-    public static function findFirst($parameters = null)
-    {
-        return parent::findFirst($parameters);
     }
 
 }

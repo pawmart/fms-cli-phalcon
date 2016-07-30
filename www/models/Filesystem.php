@@ -2,101 +2,184 @@
 
 namespace Pawel\Fms;
 
+use Pawel\Fms\Adapter\Local;
+use Phalcon\Mvc\Model\Exception as ModelException;
+
 /**
  * Class Filesystem.
  */
 class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
 {
+    // TODO: Move this constant to abstract model (when we have our own).
+    const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
     use RepositoryTrait;
 
-    /**
-     *
-     * @var integer
-     */
+    const TYPE_LOCAL = 1;
+
+    /** @var integer */
     public $id;
 
-    /**
-     *
-     * @var string
-     */
+    /** @var integer */
+    public $type;
+
+    /** @var string */
     public $rootPath;
 
+    /** @var  Local */
+    private $adapter;
+
+
+    /**
+     * This should really be abstracted from here but lets keep it here for now.
+     *
+     * TODO: This should return AdapterInterface.
+     *
+     * @return Local
+     * @throws ModelException
+     */
+    public function getAdapter()
+    {
+        if (null !== $this->adapter) {
+            return $this->adapter;
+        }
+
+        switch ($this->type) {
+            case self::TYPE_LOCAL:
+                return new Local($this->rootPath);
+            default:
+                throw new ModelException('No specified adapter supported');
+        }
+    }
 
     public function createFile(FileInterface $file, FolderInterface $parent)
     {
+        $now = new \DateTime();
 
+        $file->setParentFolder($parent);
+
+        $file->setCreatedTime($now);
+        $file->setModifiedTime($now);
+
+        $file->save();
+
+        $this->getAdapter()->touchFile($file);
     }
 
 
     public function updateFile(FileInterface $file)
     {
-        // TODO: Implement updateFile() method.
+        $file->save();
+
+        $this->getAdapter()->touchFile($file);
     }
 
 
     public function renameFile(FileInterface $file, $newName)
     {
-        // TODO: Implement renameFile() method.
+        $file->name = $newName;
+        $file->save();
+
+        $this->getAdapter()->moveFile($file, $newName);
     }
 
 
     public function deleteFile(FileInterface $file)
     {
-        // TODO: Implement deleteFile() method.
+        $file->delete();
+
+        $this->getAdapter()->remove($file);
     }
 
 
+    /**
+     * This method upsets me. Should we really allow root folder creation?
+     *
+     * API could be a bit cleaner without it i think.
+     *
+     * @param FolderInterface $folder
+     *
+     * @return Files
+     */
     public function createRootFolder(FolderInterface $folder)
     {
-        // TODO: Implement createRootFolder() method.
+        // TODO: Lets discard whatever has been passed to us ;/
+        $rootFolder = Folder::findFirst(['name' => '.']);
+
+        if ($rootFolder) {
+            return $rootFolder;
+        }
+
+        $folder->setPath($this->rootPath);
+        $folder->setName('.');
+
+        $dateTime = new \DateTime();
+        $folder->setCreatedTime($dateTime);
+
+        $folder->save();
+
+        $this->getAdapter()->createRootFolder($this->rootPath);
+
+        return $folder;
     }
 
 
     public function createFolder(FolderInterface $folder, FolderInterface $parent)
     {
-        // TODO: Implement createFolder() method.
+        $folder->save();
+
+        $this->getAdapter()->createFolder($folder);
+
+        return $folder;
     }
 
 
     public function deleteFolder(FolderInterface $folder)
     {
-        // TODO: Implement deleteFolder() method.
+        $folder->delete();
+
+        $this->getAdapter()->deleteFolder($folder);
     }
 
 
     public function renameFolder(FolderInterface $folder, $newName)
     {
-        // TODO: Implement renameFolder() method.
+        $folder->name = $newName;
+        $folder->save();
+
+        $this->getAdapter()->moveFolder($folder, $newName);
+
     }
 
 
     public function getFolderCount(FolderInterface $folder)
     {
-        // TODO: Implement getFolderCount() method.
+        return count($this->getFolders($folder));
+
     }
 
 
     public function getFileCount(FolderInterface $folder)
     {
-        // TODO: Implement getFileCount() method.
+        return count($this->getFiles($folder));
     }
 
 
     public function getDirectorySize(FolderInterface $folder)
     {
-        // TODO: Implement getDirectorySize() method.
+        return $this->getAdapter()->getFolderSize($folder);
     }
 
 
     public function getFolders(FolderInterface $folder)
     {
-        // TODO: Implement getFolders() method.
+        return Folder::find(['filesystem_id' => $this->id]);
     }
 
 
     public function getFiles(FolderInterface $folder)
     {
-        // TODO: Implement getFiles() method.
+        return File::find(['folder_id' => $folder->id]);
     }
 
 
@@ -105,7 +188,7 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
      */
     public function initialize()
     {
-        $this->hasMany('id', 'Folders', 'filesystem_id', array('alias' => 'Folders'));
+        $this->hasMany('id', Folder::class, 'filesystem_id', array('alias' => Folder::class));
 
         $this->keepSnapshots(true);
     }
@@ -120,26 +203,5 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
         return 'filesystems';
     }
 
-    /**
-     * Allows to query a set of records that match the specified conditions
-     *
-     * @param mixed $parameters
-     * @return Filesystems[]
-     */
-    public static function find($parameters = null)
-    {
-        return parent::find($parameters);
-    }
-
-    /**
-     * Allows to query the first record that match the specified conditions
-     *
-     * @param mixed $parameters
-     * @return Filesystems
-     */
-    public static function findFirst($parameters = null)
-    {
-        return parent::findFirst($parameters);
-    }
 
 }
