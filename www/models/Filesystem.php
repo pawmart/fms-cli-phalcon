@@ -4,6 +4,9 @@ namespace Pawel\Fms;
 
 use Pawel\Fms\Adapter\Local;
 use Phalcon\Mvc\Model\Exception as ModelException;
+use Phalcon\Validation\Validator;
+use Phalcon\Validation;
+
 
 /**
  * Class Filesystem.
@@ -30,6 +33,18 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
     private $adapter;
 
 
+    public function validation()
+    {
+        $validation = new Validation();
+
+        $validation->add(['rootPath', 'type'], new Validator\Uniqueness([
+           'message' => 'Filesystem should have unique rootPath per type',
+           'model' => $this
+        ]));
+
+        return $this->validate($validation);
+    }
+
     /**
      * This should really be abstracted from here but lets keep it here for now.
      *
@@ -54,6 +69,15 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
 
     public function createFile(FileInterface $file, FolderInterface $parent)
     {
+        $data = [
+            'folder_id' => $parent->id,
+            'name' => $file->getName(),
+        ];
+
+        if ($exists = File::findFirst($data)) {
+            return $exists;
+        }
+
         $now = new \DateTime();
 
         $file->setParentFolder($parent);
@@ -126,6 +150,16 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
 
     public function createFolder(FolderInterface $folder, FolderInterface $parent)
     {
+        // If folder already there don't do anything
+        if ($exists = Folder::findFirst(
+            [
+                'path' => $folder->getPath(),
+                'name' => $folder->getName(),
+                'filesystem_id' => $folder->filesystem_id,
+            ])) {
+            return $exists;
+        }
+
         $folder->save();
 
         $this->getAdapter()->createFolder($folder);

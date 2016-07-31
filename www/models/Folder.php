@@ -2,6 +2,10 @@
 
 namespace Pawel\Fms;
 
+use Phalcon\Validation\Validator;
+use Phalcon\Validation;
+use Phalcon\Mvc\Model\Behavior\Timestampable;
+
 /**
  * Class Folder.
  */
@@ -9,7 +13,7 @@ class Folder extends \Phalcon\Mvc\Model implements FolderInterface
 {
 
     // TODO: Move this constant to abstract model (when we have our own).
-    const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+    const DATE_TIME_FORMAT = 'Y-m-d H:i:s.z';
 
     use RepositoryTrait;
 
@@ -30,6 +34,23 @@ class Folder extends \Phalcon\Mvc\Model implements FolderInterface
 
     /** @var integer */
     public $filesystem_id;
+
+
+    public function validation()
+    {
+        $validation = new Validation();
+
+        $validation->add(['name', 'parent_id', 'filesystem_id'], new Validator\Uniqueness([
+           'message' => 'Folder should have unique name and parent directory',
+           'model' => $this
+        ]));
+
+        return $this->validate($validation);
+    }
+
+    public function beforeCreate(){
+        $this->date_created = date(self::DATE_TIME_FORMAT);
+    }
 
 
     /**
@@ -66,11 +87,7 @@ class Folder extends \Phalcon\Mvc\Model implements FolderInterface
      */
     public function setCreatedTime($created)
     {
-        if (!$created instanceof \DateTime) {
-            throw new \LogicException('Date added should be DateTime object');
-        }
-
-        $this->date_created = $created->format(self::DATE_TIME_FORMAT);
+        // TODO: This should not be needed, handled by initialise.
     }
 
 
@@ -105,6 +122,13 @@ class Folder extends \Phalcon\Mvc\Model implements FolderInterface
         $this->belongsTo('filesystem_id', Filesystem::class, 'id', ['alias' => Filesystem::class]);
 
         $this->keepSnapshots(true);
+
+        $this->addBehavior(new Timestampable(array(
+            'beforeValidationOnCreate' => array(
+                'field' => 'date_created',
+                'format' => self::DATE_TIME_FORMAT
+            )
+        )));
     }
 
 

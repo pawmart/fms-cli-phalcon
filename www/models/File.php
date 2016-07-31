@@ -2,6 +2,9 @@
 
 namespace Pawel\Fms;
 
+use Phalcon\Validation\Validator;
+use Phalcon\Validation;
+use Phalcon\Mvc\Model\Behavior\Timestampable;
 /**
  * Class File.
  */
@@ -9,7 +12,7 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
 {
 
     // TODO: Move this constant to abstract model (when we have our own).
-    const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+    const DATE_TIME_FORMAT = 'Y-m-d H:i:s.z';
 
     use RepositoryTrait;
 
@@ -31,6 +34,25 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
     /** @var integer */
     public $folder_id;
 
+    public function validation()
+    {
+        $validation = new Validation();
+
+        $validation->add(['name', 'folder_id'], new Validator\Uniqueness([
+           'message' => 'File should have unique name per folder',
+           'model' => $this
+        ]));
+
+        return $this->validate($validation);
+    }
+
+    public function beforeCreate(){
+        $this->date_created = date(self::DATE_TIME_FORMAT);
+    }
+
+    public function beforeUpdate(){
+        $this->date_modified = date(self::DATE_TIME_FORMAT);
+    }
 
     /**
      * @inheritdoc
@@ -86,11 +108,8 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
      */
     public function setCreatedTime($created)
     {
-        if (!$created instanceof \DateTime) {
-            throw new \LogicException('Date added should be DateTime object');
-        }
-
-        $this->date_created = $created->format(self::DATE_TIME_FORMAT);
+        // TODO: This should not be needed, handled by initialise.
+        $this->date_modified = date(self::DATE_TIME_FORMAT);
     }
 
 
@@ -108,11 +127,7 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
      */
     public function setModifiedTime($modified)
     {
-        if (!$modified instanceof \DateTime) {
-            throw new \LogicException('Date modified should be DateTime object');
-        }
-
-        $this->date_modified = $modified->format(self::DATE_TIME_FORMAT);
+        // No need to action this as this is taken care of in beforeUpdate.
     }
 
 
@@ -152,6 +167,14 @@ class File extends \Phalcon\Mvc\Model implements FileInterface
         $this->belongsTo('folder_id', Folder::class, 'id', ['alias' => Folder::class]);
 
         $this->keepSnapshots(true);
+
+
+        $this->addBehavior(new Timestampable(array(
+            'beforeValidationOnCreate' => array(
+                'field' => 'date_created',
+                'format' => self::DATE_TIME_FORMAT
+            )
+        )));
     }
 
 

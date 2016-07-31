@@ -42,14 +42,6 @@ class DbTask extends \Phalcon\Cli\Task
      */
     protected function createTables()
     {
-        /**
-         * TODO: Few things to highlight here.
-         *
-         * - Filesystem should have its type based on adapter (the concept we don't have yet)
-         * - rootPath should be probably unique at least for 'local' adapter
-         * - some sort of slug or name would be useful if we are going to expand on it
-         */
-
         $this->db->createTable(
             "filesystems",
             null,
@@ -88,7 +80,6 @@ class DbTask extends \Phalcon\Cli\Task
         /**
          * TODO: Few things to highlight here.
          *
-         * - add unique index for path and name.
          * - date_created should strictly be always auto-populated
          * - indexing additions
          * - add proper cascade behaviour

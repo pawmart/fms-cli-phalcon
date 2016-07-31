@@ -17,8 +17,6 @@ class MainTask extends \Phalcon\Cli\Task
         $folder = new \Pawel\Fms\Folder();
         $folder->setName('pawel');
         $folder->setPath($filesystem->rootPath . '/' . $folder->getName());
-        $dateTime = new \DateTime();
-        $folder->setCreatedTime($dateTime);
 
         $file = new \Pawel\Fms\File();
         $file->setName('test.txt');
