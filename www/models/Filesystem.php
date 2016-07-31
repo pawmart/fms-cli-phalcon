@@ -116,40 +116,26 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
     }
 
 
-    /**
-     * This method upsets me. Should we really allow root folder creation?
-     *
-     * API could be a bit cleaner without it i think.
-     *
-     * @param FolderInterface $folder
-     *
-     * @return Files
-     */
     public function createRootFolder(FolderInterface $folder)
     {
-        // TODO: Lets discard whatever has been passed to us ;/
-        $rootFolder = Folder::findFirst(['name' => '.']);
+        $folder->setPath($this->rootPath . '/' . $folder->getName());
+
+        $rootFolder = Folder::findFirst(['path' => $folder->getPath()]);
 
         if ($rootFolder) {
             return $rootFolder;
         }
 
-        $folder->setPath($this->rootPath);
-        $folder->setName('.');
-
-        $dateTime = new \DateTime();
-        $folder->setCreatedTime($dateTime);
-
         $folder->save();
 
-        $this->getAdapter()->createRootFolder($this->rootPath);
-
-        return $folder;
+        $this->getAdapter()->createFolder($folder);
     }
 
 
     public function createFolder(FolderInterface $folder, FolderInterface $parent)
     {
+        $folder->setPath($parent->getPath() . '/' . $folder->getName());
+
         // If folder already there don't do anything
         if ($exists = Folder::findFirst(
             [
@@ -163,8 +149,6 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
         $folder->save();
 
         $this->getAdapter()->createFolder($folder);
-
-        return $folder;
     }
 
 

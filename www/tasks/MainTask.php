@@ -16,16 +16,18 @@ class MainTask extends \Phalcon\Cli\Task
 
         $folder = new \Pawel\Fms\Folder();
         $folder->setName('pawel');
-        $folder->setPath($filesystem->rootPath . '/' . $folder->getName());
 
         $file = new \Pawel\Fms\File();
         $file->setName('test.txt');
         $file->size = 0;
 
-        $rootFolder = $filesystem->createRootFolder(new \Pawel\Fms\Folder());
-        $filesystem->createFolder($folder, $rootFolder);
+        $subfolder = new \Pawel\Fms\Folder();
+        $subfolder->setName('pawelsub');
 
-        $filesystem->createFile($file, $folder);
+        $filesystem->createRootFolder($folder);
+        $filesystem->createFolder($subfolder, $folder);
+
+        $filesystem->createFile($file, $subfolder);
     }
 
 

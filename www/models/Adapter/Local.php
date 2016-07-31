@@ -33,17 +33,6 @@ class Local
     }
 
 
-    /**
-     * Create root folder.
-     *
-     * @param $path
-     */
-    public function createRootFolder($path)
-    {
-        // No action needed for this adapter.
-    }
-
-
     public function createFolder(FolderInterface $folder)
     {
         $path = $folder->getPath();
