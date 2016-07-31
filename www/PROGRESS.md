@@ -17,3 +17,11 @@ Task Progress Record
 - And lets create initial db schema using the task
 - Now time for models creation based on created db schema
 - Wow, phalcon db! I hate you so far ;) What is this repository, entity, model, dto? All at once with access to DI?!
+
+
+Time tracking
+----
+
+- Friday Evening
+- Saturday on and off aprox 6h
+- Sunday 2h
