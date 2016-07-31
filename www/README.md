@@ -12,7 +12,7 @@ File Management System - CLI
 ```
 
 
-- Verify all good in your browser: `http://127.0.0.1:8080/info.php`
+- Verify all is good in your browser: `http://127.0.0.1:8080/info.php`
 - Setup initial db schema `./run db`
 
 Done!

@@ -45,6 +45,12 @@ I have made some decisions I am not externally proud of so far. Mainly due to de
 Next time I would probably create a composer library and bundle integration with that library. 
 
 	- Based on behat scenarios, lets write our console tasks...
+	- Task command creation and manager to extract it from the task itself.
+
+I think i will stop here. ;) A lot of things are not addressed, like assertions, or full test coverage or proper service layer managing objects business logic and most certainly current api
+having issues. 
+
+Probably enough for the demo ;)
 
 ----
 
@@ -52,5 +58,5 @@ Time tracking summary
 ----
 
 - Friday Evening
-- Saturday on and off aprox 6h
-- Sunday 3h
+- Saturday on and off approx 6h
+- Sunday on and off approx 4h

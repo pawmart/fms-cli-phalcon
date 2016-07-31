@@ -8,10 +8,14 @@ class MainTask extends \Phalcon\Cli\Task
 {
 
     /**
-     * Experiment env.
+     * Experiment env. Playground.
      */
     public function mainAction()
     {
+        // TODO: This is just a playground.
+        echo 'Hi!';
+        exit;
+
         $filesystem = $this->getOrCreateFilesystem(__DIR__ . '/roottest');
 
         $folder = new \Pawel\Fms\Folder();

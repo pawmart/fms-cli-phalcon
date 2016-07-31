@@ -125,8 +125,9 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
         if ($rootFolder) {
             return $rootFolder;
         }
-
-        $folder->save();
+        else {
+            $folder->save();
+        }
 
         $this->getAdapter()->createFolder($folder);
     }
@@ -143,10 +144,10 @@ class Filesystem extends \Phalcon\Mvc\Model implements FileSystemInterface
                 'name' => $folder->getName(),
                 'filesystem_id' => $folder->filesystem_id,
             ])) {
-            return $exists;
         }
-
-        $folder->save();
+        else {
+            $folder->save();
+        }
 
         $this->getAdapter()->createFolder($folder);
     }

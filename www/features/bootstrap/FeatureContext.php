@@ -20,18 +20,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
 
     /**
-     * FeatureContext constructor.
-     *
-     * @param $output
-     */
-    public function __construct($output)
-    {
-        $this->output = $output;
-    }
-
-
-    /**
      * @BeforeSuite
+     *
+     * Initiate db and make sure there is no left over from previous runs.
      */
     public static function prepare(BeforeSuiteScope $scope)
     {
@@ -42,28 +33,26 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $db->dropTable('folders');
         $db->dropTable('filesystems');
 
-        // TODO: This should really come as php call, but lets just trigger db script for now.
+        // TODO: This should really come as php call, but lets just trigger db cli script for now.
         exec('./run db');
-        exec('rm -fr tasks/roottest');
+        exec('rm -fr ' . FmsTask::BASEDIR);
     }
 
 
     /**
      * @AfterScenario @database
+     *
+     * Reset db and filesystem.
      */
     public function cleanDB(AfterScenarioScope $scope)
     {
-        // clean database after scenarios,
-        // tagged with @database
-
-        // reset DB and filesystem
         $db = FeatureContext::getDi()->get('db');
 
         $db->dropTable('files');
         $db->dropTable('folders');
         $db->dropTable('filesystems');
 
-        exec('rm -fr tasks/roottest');
+        exec('rm -fr ' . realpath(FmsTask::BASEDIR));
     }
 
 
@@ -95,6 +84,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function iRun($command)
     {
         exec($command, $output);
+        $this->output = trim(implode("\n", $output));
+    }
+
+    /** @When /^I run task "([^"]*)"$/ */
+    public function iRunTask($command)
+    {
+        exec('./run ' . $command, $output);
         $this->output = trim(implode("\n", $output));
     }
 
