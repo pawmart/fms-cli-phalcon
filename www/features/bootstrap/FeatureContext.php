@@ -12,6 +12,7 @@ use Behat\Behat\Hook\Scope\AfterScenarioScope;
  */
 class FeatureContext implements Context, SnippetAcceptingContext
 {
+
     // Load phalcon container, we will need that for DB management.
     use PhalconContainerAware;
 
@@ -28,41 +29,49 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $this->output = $output;
     }
 
+
     /**
      * @BeforeSuite
      */
-     public static function prepare(BeforeSuiteScope $scope)
-     {
-         // reset DB and filesystem
-         $db = FeatureContext::getDi()->get('db');
+    public static function prepare(BeforeSuiteScope $scope)
+    {
+        // reset DB and filesystem
+        $db = FeatureContext::getDi()->get('db');
 
-         $db->dropTable('files');
-         $db->dropTable('folders');
-         $db->dropTable('filesystems');
+        $db->dropTable('files');
+        $db->dropTable('folders');
+        $db->dropTable('filesystems');
 
         // TODO: This should really come as php call, but lets just trigger db script for now.
-         exec('./run db');
-         exec('rm -fr tasks/roottest');
-     }
+        exec('./run db');
+        exec('rm -fr tasks/roottest');
+    }
 
-     /**
-      * @AfterScenario @database
-      */
-     public function cleanDB(AfterScenarioScope $scope)
-     {
-         // clean database after scenarios,
-         // tagged with @database
 
-         // reset DB and filesystem
-         $db = FeatureContext::getDi()->get('db');
+    /**
+     * @AfterScenario @database
+     */
+    public function cleanDB(AfterScenarioScope $scope)
+    {
+        // clean database after scenarios,
+        // tagged with @database
 
-         $db->dropTable('files');
-         $db->dropTable('folders');
-         $db->dropTable('filesystems');
+        // reset DB and filesystem
+        $db = FeatureContext::getDi()->get('db');
 
-         exec('rm -fr tasks/roottest');
-     }
+        $db->dropTable('files');
+        $db->dropTable('folders');
+        $db->dropTable('filesystems');
 
+        exec('rm -fr tasks/roottest');
+    }
+
+
+    /** @Given I am in root of the project */
+    public function iAmInRootOfTheProject()
+    {
+        exec('cd /vagrant/www');
+    }
 
 
     /** @Given /^I am in a directory "([^"]*)"$/ */
